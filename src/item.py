@@ -41,3 +41,60 @@ class Item:
         """
         self.price = self.price * self.pay_rate
         return self.price
+
+    @property
+    def name(self):
+        """
+        создаем декоратор property.
+        """
+        return self.__name
+
+    @name.setter
+    def name(self, name):
+        """
+        Сеттер проверяющий длину, чтоб не превышало 10 символов, и если их больше 10, то выводит первые 10 символов.
+        """
+        if len(name) > 10:
+            self.__name = name[:10]
+        else:
+            self.__name = name
+        return self.__name
+
+    @classmethod
+    def instantiate_from_csv(cls, path):
+        """
+        метод классов для экземпляров из ЦСВ
+        """
+        import csv
+        import os
+        cls.all.clear()
+        paths = os.path.exists(path)
+        if paths == False:
+            raise FileNotFoundError('Отсутствует файл item.csv')
+        else:
+            with open(path, 'r', newline='') as attributes:
+                attribute = csv.DictReader(attributes)
+                for attr in attribute:
+                    if 'name' not in attr:
+                        raise InstantiateCSVError
+                    name = attr['name']
+                    if 'price' not in attr:
+                        raise InstantiateCSVError
+                    price = cls.string_to_number(attr['price'])
+                    if 'quantity' not in attr:
+                        raise InstantiateCSVError
+                    quantity = cls.string_to_number(attr['quantity'])
+                    items_csv = Item(name, price, quantity)
+            return items_csv
+
+    @staticmethod
+    def string_to_number(string: str):
+        """
+        Метод принимает строковое значение числа и переводит его в целое число
+        """
+        if string.isdigit:
+            if '.' in string:
+                string = int(float(string))
+            else:
+                string = int(string)
+            return string
